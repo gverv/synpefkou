@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}
+<title>Συνεταιρισμός Σύνολα</title>
+<style>
+@media print {
+    /* Προσαρμογή του πίνακα */
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+}
+</style>
+{% endblock title %} 
+
+{% block content %}
+<h2>Αναφορά Υπόλοιπα</h2>
+{% if report_data %}
+    <p>Επιλέχθηκαν {{ report_data|length }} άτομα για την αναφορά.</p>
+{% comment %} 
+
+    <ul>
+    {% for person in report_data %}
+        <li>{{ person.surname }} {{ person.name }} {{ person.fathersName }}</li>
+    {% endfor %}
+    </ul>
+    <!-- Εδώ βάλε τα υπόλοιπα δεδομένα του report -->
+
+     {% endcomment %}
+    <p>Σύνολο Υπόλοιπο: {{ grand_total_balance|floatformat:2 }}</p>
+{% else %}
+    <p>Δεν επιλέχθηκαν άτομα.</p>
+{% endif %}
+
+{% comment %} <br><br> {% endcomment %}
+<button onclick="window.print()">Εκτύπωση</button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Επώνυμο Όνομα Πατρώνυμο</th>
+            <th>Αποδείξεις & Υπόλοιπα</th>
+            <th>Σύνολο Υπόλοιπο</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for person in report_data %}
+        <tr>
+            <td>{{ person.surname }} {{ person.name }} {{person.fathersName }}</td>
+            <td>
+                {% for payment in person.payments %}
+                    {{ payment.receiptNumber }}: {{ payment.balance }}<br>
+                {% endfor %}
+            </td>
+            <td>{{ person.total_balance|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock content %}

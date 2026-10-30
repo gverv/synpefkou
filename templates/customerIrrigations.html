@@ -1,0 +1,116 @@
+{% extends "base.html" %} 
+{% load humanize %}
+
+{% block title %}
+<title>Συνεταιρισμός {{customer}}</title>
+<style>
+  td a.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px; /* Μικρότερο ύψος */
+    padding: 5px 10px; /* Ρύθμιση εσωτερικού κενού */
+    font-size: 14px; /* Αν θες να μειώσεις και το μέγεθος της γραμματοσειράς */
+  }
+</style>
+{% endblock title %} 
+
+
+{% block content %}
+
+<div class="container mt-5">
+    <button type="button" class="btn btn-secondary mb-3" onclick="window.print()">Εκτύπωση</button>
+    <div class="row">
+        <div class="col-md-8">
+            <h4 class="text-center text-white bg-dark p-3">Αποδείξεις</h4>
+            <h5>
+              Συνολική Αξία: {{ total_cost|floatformat:2|intcomma }}
+              Συνολικά κυβικά: {{total_cubic|intcomma}} 
+              Χρεώσιμα: {{total_billable|intcomma}} 
+              Πλήρωσε: {{ total_paid|floatformat:2|intcomma }}
+              Οφείλει: {{ debt|floatformat:2|intcomma }}
+            </h5>
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">
+                      <a href="?paids_sort=receiptNumber&paids_order={% if paids_order == 'asc' %}desc{% else %}asc{% endif %}">ΑρΑπόδ</a>
+                    </th>
+                    <th scope="col">Ποτισμός</th>
+                    <th scope="col">Πληρωμή</th>
+                    <th scope="col">Ημ/νία</th>
+                    <th scope="col">Ισοζύγιο</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for d in customerPaids %}
+                    <tr>
+                      <td>
+                        {% if d.balance == 0 %}
+                          <a href="{% url 'paids_update' d.id %}" class="text-primary">{{d.receiptNumber}}</a>
+                        {% elif d.balance > 0 %}
+                          <a href="{% url 'paids_update' d.id %}" class="text-success">{{d.receiptNumber}}</a>
+                        {% elif d.balance < 0 %}
+                          <a href="{% url 'paids_update' d.id %}" class="text-danger">{{d.receiptNumber}}</a>
+                        {% else %}
+                          <a href="{% url 'paids_update' d.id %}" class="text-warning">{{d.receiptNumber}}</a>
+                        {% endif %}
+                      </td>
+                      <td>{{d.irrigation}}</td>
+                      <td>{{d.paid}}</td>
+                      <td>{{d.paymentDate}}</td>
+                      <td>{{d.balance}}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+          <h4 class="text-center text-white bg-dark p-3 sticky-top">Ποτισμοί {{customer}}</h4>
+          <h5>
+            Συνολική Αξία: {{ total_cost|floatformat:2|intcomma }}
+            Συνολικά κυβικά: {{total_cubic|intcomma}} 
+            Χρεώσιμα: {{total_billable|intcomma}} 
+            Πλήρωσε: {{ total_paid|floatformat:2|intcomma }}
+            Οφείλει: {{ debt|floatformat:2|intcomma }}
+          </h5>
+          <table class="table">
+              <thead>
+                 <tr>
+                      <th scope="col"><a href="?sort=id&order={% if order == 'asc' %}desc{% else %}asc{% endif %}">Id</a></th>
+                      <th scope="col">Ημερομηνία</th>
+                      <th scope="col">Κυβικά</th>
+                      <th scope="col">Αξία</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in data %}
+                    <tr>
+                      <td scope="row"><a href="{% url 'update_irrigation' d.id %}" class="text-warning">{{d.id}}</a></td>
+                      <td>{{ d.date|date:"D, d-m-y" }}</td>
+                      <td>{{d.billableCubicMeters}}</td>
+                      <td>
+                        {% if d.paid_irrigations.exists %}
+                          <a href="{% url 'paids_update' d.paid_irrigations.first.id %}" class="text-primary">{{d.cost}}</a>
+                        {% else %}
+                          <a href="{% url 'create_payment' d.id %}" class="text-success">{{d.cost}}</a>
+                        {% endif %}
+                      </td>
+                      {% comment %} <td><a type="button"  href="/delete/{{d.id}}"  class="btn btn-danger">Delete</a></td> {% endcomment %}
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+        </div>
+    </div>
+</div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let numberElements = document.querySelectorAll(".format-number");
+    
+        numberElements.forEach(element => {
+            let formattedValue = element.innerText.replace(/\B(?=(\d{3})+(?!\d))/g, ".").replace(/(\d+)\.(\d\d)$/, '$1,$2');
+            element.innerText = formattedValue;
+        });
+    });
+    </script>
+{% endblock content %}

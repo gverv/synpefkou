@@ -1,0 +1,52 @@
+<nav aria-label="Σελιδοποίηση">
+  <ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}&sort={{ sort_by }}&order={{ order }}" aria-label="Previous">&lt;</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled">
+        <span class="page-link">&lt;</span>
+      </li>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+      {% if num == page_obj.number %}
+        <li class="page-item active" aria-current="page">
+          <span class="page-link">{{ num }}</span>
+        </li>
+      {% elif num <= 2 %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ num }}&sort={{ sort_by }}&order={{ order }}">{{ num }}</a>
+        </li>
+      {% elif num > page_obj.paginator.num_pages|add:"-2" %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ num }}&sort={{ sort_by }}&order={{ order }}">{{ num }}</a>
+        </li>
+      {% elif num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ num }}&sort={{ sort_by }}&order={{ order }}">{{ num }}</a>
+        </li>
+      {% elif num == 3 and page_obj.number > 5 %}
+        <li class="page-item disabled"><span class="page-link">...</span></li>
+      {% elif num == page_obj.paginator.num_pages|add:"-2" and page_obj.number < page_obj.paginator.num_pages|add:"-4" %}
+        <li class="page-item disabled"><span class="page-link">...</span></li>
+      {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}&sort={{ sort_by }}&order={{ order }}" aria-label="Next">&gt;</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled">
+        <span class="page-link">&gt;</span>
+      </li>
+    {% endif %}
+
+    <!-- Κουμπί All μετά το σύμβολο > -->
+    <li class="page-item ms-2">
+      <a class="page-link btn btn-outline-primary" href="?all=1">All</a>
+    </li>
+  </ul>
+</nav>

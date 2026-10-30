@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %} <title>Συνεταιρισμός - Ταμείο</title> {% endblock title %}
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Αρχική</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'cashtransactions' %}">Κινήσεις Ταμείου</a></li>
+    <li class="breadcrumb-item active" aria-current="page">
+      {% if form.instance.pk %}Ενημέρωση Κίνησης{% else %}Νέα Κίνηση{% endif %}
+    </li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <h2 style="font-size:1.3rem;">
+        {% if form.instance.pk %}Ενημέρωση Κίνησης Ταμείου{% else %}Νέα Κίνηση Ταμείου{% endif %}
+    </h2>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {{ form|crispy }}
+
+        <div class="d-flex flex-column flex-md-row gap-2 mt-3">
+            {% if can_write %}
+            <button type="submit" class="btn btn-success">
+                {% if form.instance.pk %}Ενημέρωση{% else %}Αποθήκευση{% endif %}
+            </button>
+            {% else %}
+            <span class="text-muted">Προβολή μόνο — δεν έχετε δικαίωμα τροποποίησης.</span>
+            {% endif %}
+            <a href="{% url 'cashtransactions' %}" class="btn btn-secondary">Επιστροφή</a>
+        </div>
+    </form>
+</div>
+
+<style>
+  @media (max-width: 576px) {
+    h2 { font-size: 1.1rem !important; }
+    .container-fluid { padding-left: 5px !important; padding-right: 5px !important; }
+    .btn { font-size: 0.95rem; padding: 0.45rem 0.8rem; }
+    .mt-3 { margin-top: 0.8rem !important; }
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const categoryField = document.getElementById('id_category');
+    const typeField = document.getElementById('id_type');
+    const receiverField = document.getElementById('id_receiver');
+    const categoryTypeMap = {{ category_type_map|safe }};
+
+    if (receiverField && !receiverField.value) {
+        receiverField.value = '1';
+    }
+
+    function toggleTypeField() {
+        if (!categoryField || !typeField) {
+            return;
+        }
+
+        const selectedCategoryId = categoryField.value;
+        const hasAutoType = selectedCategoryId in categoryTypeMap;
+        const typeWrapper = typeField.closest('.mb-3') || typeField.closest('.form-group') || typeField.parentElement;
+
+        if (hasAutoType) {
+            if (typeWrapper) {
+                typeWrapper.style.display = '';
+            }
+            const autoType = categoryTypeMap[selectedCategoryId];
+            typeField.value = autoType;
+            typeField.disabled = true;
+            typeField.setAttribute('readonly', 'readonly');
+            typeField.style.backgroundColor = '#e9ecef';
+            typeField.style.color = '#6c757d';
+        } else {
+            if (typeWrapper) {
+                typeWrapper.style.display = '';
+            }
+            typeField.disabled = false;
+            typeField.removeAttribute('readonly');
+            typeField.value = '';
+            typeField.style.backgroundColor = '';
+            typeField.style.color = '';
+        }
+    }
+
+    toggleTypeField();
+    categoryField?.addEventListener('change', toggleTypeField);
+});
+</script>
+{% endblock %}

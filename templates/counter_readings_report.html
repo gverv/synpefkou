@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}
+<title>Αναφορά μετρητών και ενδείξεων</title>
+<style>
+    .counter-readings-table .reading-row,
+    .counter-readings-table .blank-row {
+        height: 2.5rem;
+    }
+
+    .counter-readings-table .reading-row td,
+    .counter-readings-table .blank-row td {
+        height: 2.5rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        line-height: 1.5rem;
+        vertical-align: middle;
+    }
+
+    @media print {
+        .counter-readings-table .counter-block {
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+    }
+</style>
+{% endblock title %}
+
+{% block content %}
+<h2>Αναφορά μετρητών και ενδείξεων</h2>
+<button type="button" class="btn btn-secondary mb-3" onclick="window.print()">Εκτύπωση</button>
+
+<table class="table counter-readings-table">
+        {% for group in report_groups %}
+            {% for row in group.rows %}
+    <tbody class="counter-block">
+            <tr class="table-primary fw-bold">
+                <td>{{ group.collecter }}</td>
+                <td>{{ row.counter.counter|default_if_none:"" }}</td>
+                <td>{{ row.counter.customer|default_if_none:"" }}</td>
+            </tr>
+                {% for reading in row.readings %}
+            <tr class="reading-row">
+                <td>{{ reading.date|date:"d/m/Y" }}</td>
+                <td>{{ reading.finalIndication }}</td>
+                <td></td>
+            </tr>
+                {% endfor %}
+                {% if row.readings|length == 0 %}
+            <tr class="blank-row"><td></td><td></td><td></td></tr>
+            <tr class="blank-row"><td></td><td></td><td></td></tr>
+                {% elif row.readings|length == 1 %}
+            <tr class="blank-row"><td></td><td></td><td></td></tr>
+                {% endif %}
+            <tr class="blank-row"><td></td><td></td><td></td></tr>
+            <tr class="blank-row"><td></td><td></td><td></td></tr>
+    </tbody>
+            {% endfor %}
+        {% empty %}
+    <tbody>
+        <tr><td colspan="3">Δεν υπάρχουν καταχωρημένοι μετρητές.</td></tr>
+    </tbody>
+        {% endfor %}
+</table>
+{% endblock content %}

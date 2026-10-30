@@ -1,0 +1,35 @@
+<!-- templates/registration/login.html -->
+{% extends 'base.html' %}
+
+{% block title %} <title>Συνεταιρισμός - Είσοδος</title> {% endblock title %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-5 col-lg-4">
+    <div class="card shadow-sm mt-5">
+      <div class="card-body">
+        <h2 class="card-title text-center mb-4">Σύνδεση</h2>
+        {% if form.errors %}
+          <div class="alert alert-danger text-center py-2">
+            Τα στοιχεία είναι λάθος. Προσπάθησε ξανά.
+          </div>
+        {% endif %}
+        <form method="post" autocomplete="off">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="id_username" class="form-label">Όνομα χρήστη</label>
+            <input type="text" name="username" class="form-control" id="id_username" required autofocus>
+          </div>
+          <div class="mb-3">
+            <label for="id_password" class="form-label">Κωδικός</label>
+            <input type="password" name="password" class="form-control" id="id_password" required>
+          </div>
+          <div class="d-grid mt-3">
+            <button type="submit" class="btn btn-primary">Σύνδεση</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

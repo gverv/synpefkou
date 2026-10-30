@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="el">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}{% endblock title %}
+
+    <link rel="icon" href="{% static 'favicon.ico' %}" sizes="32x32">
+    <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+          crossorigin="anonymous">
+    <style>
+        .navbar-toggler { border-color: #fff; }
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba%28255,255,255,1%29' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+        }
+
+        body { padding-top: 80px; }
+        thead { position: sticky; top: 0; background-color: #0d6efd; color: #fff; z-index: 1020; }
+        tbody tr:nth-child(odd) { background-color: #f9f9f9; }
+        tbody tr:nth-child(even) { background-color: #e9ecef; }
+        tbody tr:hover { background-color: #d3e0f0; }
+        h2 { color: #0d6efd; font-weight: 600; }
+        .messages { padding-left: 0; }
+
+        @media print {
+            button, .btn, a.btn, .menu, .sidebar, .navbar { display: none; }
+        }
+
+        @media (max-width: 576px) {
+            body { padding-top: 60px; }
+            main.container { padding-left: 5px; padding-right: 5px; }
+            h2 { font-size: 1.3rem; }
+            .table { font-size: 0.95rem; }
+            .messages { font-size: 0.95rem; }
+        }
+    </style>
+</head>
+<body>
+{% if user.is_authenticated %}
+    {% include "navbar.html" %}
+    <div class="container-md mt-5 pt-4">
+        {% block breadcrumbs %}{% endblock %}
+    </div>
+{% endif %}
+
+{% if not user.is_authenticated and request.resolver_match.url_name != 'login' %}
+<script>window.location.href = "{% url 'login' %}";</script>
+{% endif %}
+
+{% if messages %}
+<div class="container mt-3 messages">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<main class="container-fluid mt-3">
+    {% block content %}{% endblock content %}
+</main>
+
+<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+<script src="https://unpkg.com/alpinejs" defer></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    // Προσαρμογή padding για navbar
+    const navbar = document.querySelector('.navbar');
+    if (navbar) {
+        document.body.style.paddingTop = `${navbar.offsetHeight}px`;
+    }
+
+    // Αυτόματο fade-out και αφαίρεση alerts
+    const alerts = document.querySelectorAll('.messages .alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.classList.remove('show');
+            alert.classList.add('fade');
+            alert.addEventListener('transitionend', () => alert.remove());
+        }, 3000);
+    });
+});
+</script>
+</body>
+</html>

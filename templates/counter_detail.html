@@ -1,0 +1,64 @@
+{% extends "base.html" %} 
+
+{% block title %}
+<title>Συνεταιρισμός - Μετρητές</title>
+
+{% endblock title %} 
+
+
+{% block content %}
+
+<div class="container-fluid mt-4">
+    <h2 style="font-size:1.3rem;" class="mb-3">Καταναλώσεις για το ρολόι <strong>{{ counter.collecter }} {{ counter.counter }}</strong></h2>
+    <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle shadow-sm">
+                    <thead>
+                            <tr>
+                                    <th class="customer-column">Καταναλωτής</th>
+                                    <th>Ημερομηνία</th>
+                                    <th>Τελική Ένδειξη</th>
+                                    <th>Κυβικά</th>
+                            </tr>
+                    </thead>
+                    <tbody>
+                            {% for cons in consumptions %}
+                            <tr>
+                                    <td class="customer-column">{{ cons.customer }}</td>
+                                    <td>{{ cons.date|date:"d/m/Y" }}</td>
+                                    <td>{{ cons.finalIndication }}</td>
+                                    <td>{{ cons.billableCubicMeters }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                    <td colspan="4" class="text-center">Δεν υπάρχουν καταναλώσεις.</td>
+                            </tr>
+                            {% endfor %}
+                    </tbody>
+            </table>
+    </div>
+</div>
+<style>
+    .customer-column {
+        width: clamp(140px, 25vw, 280px);
+        max-width: 280px;
+        overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 576px) {
+        h2 {
+            font-size: 1.1rem !important;
+        }
+        .container-fluid {
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+        }
+        .table {
+            font-size: 0.95rem;
+        }
+        th, td {
+            padding: 0.3rem;
+        }
+    }
+</style>
+
+{% endblock content %}

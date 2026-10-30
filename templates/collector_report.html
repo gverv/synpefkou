@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load l10n %}
+
+{% block title %}
+<title>Αναφορά εισπράκτορα</title>
+{% endblock title %}
+
+{% block content %}
+<h2>Αναφορά εισπράκτορα</h2>
+
+<form method="get" class="row g-3 align-items-end mb-4">
+    <div class="col-12 col-md-3">
+        <label for="{{ form.date_from.id_for_label }}" class="form-label">{{ form.date_from.label }}</label>
+        {{ form.date_from }}
+        {% for error in form.date_from.errors %}<div class="text-danger">{{ error }}</div>{% endfor %}
+    </div>
+    <div class="col-12 col-md-3">
+        <label for="{{ form.date_to.id_for_label }}" class="form-label">{{ form.date_to.label }}</label>
+        {{ form.date_to }}
+        {% for error in form.date_to.errors %}<div class="text-danger">{{ error }}</div>{% endfor %}
+    </div>
+    <div class="col-12 col-md-3">
+        <label for="{{ form.receiver.id_for_label }}" class="form-label">{{ form.receiver.label }}</label>
+        {{ form.receiver }}
+        {% for error in form.receiver.errors %}<div class="text-danger">{{ error }}</div>{% endfor %}
+    </div>
+    <div class="col-12 col-md-3">
+        <button type="submit" class="btn btn-primary">Εμφάνιση αναφοράς</button>
+    </div>
+</form>
+
+{% if form.non_field_errors %}
+    {% for error in form.non_field_errors %}<p class="text-danger">{{ error }}</p>{% endfor %}
+{% endif %}
+
+{% if form.is_bound and form.is_valid %}
+    <button type="button" class="btn btn-secondary mb-3" onclick="window.print()">Εκτύπωση</button>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Απόδειξη</th>
+                <th>Αξία</th>
+                <th>Εισπράκτορας</th>
+                <th>Ημερομηνία</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in report_rows %}
+            <tr>
+                <td>{{ row.receiptNumber|default_if_none:"—" }}</td>
+                <td>{{ row.paid|floatformat:2|localize }}</td>
+                <td>{{ row.collectorFee|floatformat:2|localize }}</td>
+                <td>{{ row.paymentDate|date:"d/m/Y"|default_if_none:"—" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4">Δεν βρέθηκαν αποδείξεις για τα επιλεγμένα φίλτρα.</td></tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="2" class="text-end">Σύνολο εισπράκτορα</th>
+                <th>{{ total_collector_fee|floatformat:2|localize }}</th>
+                <th></th>
+            </tr>
+        </tfoot>
+    </table>
+{% endif %}
+{% endblock content %}

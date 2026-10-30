@@ -1,0 +1,35 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-dark fixed-top">
+  <div class="container-md">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link text-light" href="/">Ποτισμοί</a></li>
+        <li class="nav-item"><a class="nav-link text-light" href="/customers/">Καταναλωτές</a></li>
+        <li class="nav-item"><a class="nav-link text-light" href="/counters/">Μετρητές</a></li>
+        <li class="nav-item"><a class="nav-link text-light" href="/paids/">Αποδείξεις</a></li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle text-light" href="#" id="reportsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Αναφορά</a>
+          <ul class="dropdown-menu" aria-labelledby="reportsDropdown">
+            <li><a class="dropdown-item" href="{% url 'select_persons_for_report' %}">Αποδείξεις με υπόλοιπα</a></li>
+            <li><a class="dropdown-item" href="{% url 'hydronomist_report' %}">Υδρονομέας</a></li>
+            <li><a class="dropdown-item" href="{% url 'collector_report' %}">Εισπράκτορας</a></li>
+            <li><a class="dropdown-item" href="{% url 'counter_list_report' %}">Κατάσταση μετρητών</a></li>
+            <li><a class="dropdown-item" href="{% url 'counter_readings_report' %}">Μετρητές και ενδείξεις</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><a class="nav-link text-light" href="/irrigations/add">Προσθήκη ποτισμού</a></li>
+        <li class="nav-item"><a class="nav-link text-light" href="/cashtransactions">Ταμείο</a></li>
+      </ul>
+      <form class="d-flex me-2" method="get" action="{% url 'global_search' %}">
+        <input class="form-control me-2" type="search" name="q" placeholder="Αναζήτηση..." aria-label="Αναζήτηση">
+        <button class="btn btn-outline-primary" type="submit">🔍</button>
+      </form>
+      <form method="post" action="{% url 'logout' %}" class="mb-0">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-danger">Αποσύνδεση</button>
+      </form>
+    </div>
+  </div>
+</nav>

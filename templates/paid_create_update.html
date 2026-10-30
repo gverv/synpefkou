@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %} <title>Συνεταιρισμός - Απόδειξη</title> {% endblock title %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    {% if form.instance.pk %}
+        <h2 style="font-size:1.3rem;">Ενημέρωση Απόδειξης #{{ form.instance.receiptNumber }}</h2>
+    {% else %}
+        <h2 style="font-size:1.3rem;">Έκδοση Απόδειξης</h2>
+    {% endif %}
+
+    <form method="post" id="receiptForm">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Ποτισμός</label>
+            <input type="text" class="form-control" value="{{ irrigation|default:form.instance.irrigation }}" readonly>
+          </div>
+          {% comment %} <div class="col-md-6">
+            <label class="form-label">Καταναλωτής</label>
+            <input type="text" class="form-control" value="{{ form.instance.customer }}" readonly>
+          </div>
+        </div> {% endcomment %}
+
+        <div class="d-flex flex-column flex-md-row gap-2 mt-2">
+            <button type="button" class="btn btn-primary" id="fillPayment" {% if not can_write %}disabled{% endif %}>Πληρωμή</button>
+            <button type="button" class="btn btn-secondary" id="copyNotesBtn" {% if not can_write %}disabled{% endif %}>Αντιγραφή μηνύματος</button>
+            <button type="button" class="btn btn-info" id="copyAndSaveBtn" {% if not can_write %}disabled{% endif %}>Αντιγραφή μηνύματος → Αποθήκευση</button>
+            {% if can_write %}
+                {% if form.instance.pk %}
+                    <button type="submit" class="btn btn-success">Ενημέρωση</button>
+                {% else %}
+                    <button type="submit" class="btn btn-success">Αποθήκευση</button>
+                {% endif %}
+            {% else %}
+                <span class="text-muted">Προβολή μόνο — δεν έχετε δικαίωμα τροποποίησης.</span>
+            {% endif %}
+            <button type="button" class="btn btn-outline-secondary" id="cancelBtn">Άκυρο</button>
+        </div>
+    </form>
+</div>
+
+<style>
+  #saveBtn:focus {
+    outline: 3px solid #28a745;
+    outline-offset: 3px;
+    box-shadow: 0 0 8px #28a745;
+  }
+  @media (max-width: 576px) {
+    h2 {
+      font-size: 1.1rem !important;
+    }
+    .container-fluid {
+      padding-left: 5px !important;
+      padding-right: 5px !important;
+    }
+    .btn {
+      font-size: 0.95rem;
+      padding: 0.4rem 0.7rem;
+    }
+    .mt-2 {
+      margin-top: 0.7rem !important;
+    }
+  }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    let costField = document.querySelector("[name='cost']");
+    let paidField = document.querySelector("[name='paid']");
+    let balanceField = document.querySelector("[name='balance']");
+    let receiptNumberField = document.querySelector("[name='receiptNumber']");
+    let notesField = document.querySelector("[name='notes']");
+    let paymentDateField = document.querySelector("[name='paymentDate']");
+    let receiverField = document.querySelector("[name='receiver']");
+    let copyNotesBtn = document.getElementById("copyNotesBtn");
+    let copyAndSaveBtn = document.getElementById("copyAndSaveBtn");
+    let receiptForm = document.getElementById("receiptForm");
+    let cancelBtn = document.getElementById("cancelBtn");
+    let collectorFeeRateField = document.getElementById("id_collectorFeeRate");
+    let collectorFeeField = document.getElementById("id_collectorFee");
+    let httpMsg = "{{ msg|default:''|escapejs }}";
+    let irrigationMsg = "{{ form.instance.irrigation.msg|default:''|escapejs }}";
+    let sourceMsg = httpMsg || irrigationMsg;
+
+    cancelBtn.addEventListener("click", function() {
+        const previousPage = document.referrer;
+        if (previousPage && new URL(previousPage).origin === window.location.origin) {
+            window.location.assign(previousPage);
+        } else {
+            window.location.assign("{% url 'index' %}");
+        }
+    });
+
+    window.addEventListener("keydown", function(event) {
+        if (event.key === "Escape" || event.key === "Esc") {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            cancelBtn.click();
+        }
+    }, true);
+
+    // Αυτόματος υπολογισμός υπολοίπου
+    paidField.addEventListener("input", function() {
+        let paidValue = parseFloat(paidField.value) || 0;
+        let costValue = parseFloat(costField.value) || 0;
+        balanceField.value = (paidValue - costValue).toFixed(2);
+        updateCollectorFee();
+    });
+
+    // Προεπιλεγμένες τιμές με "Πληρωμή"
+    document.getElementById("fillPayment").addEventListener("click", function() {
+        paidField.value = costField.value;
+        balanceField.value = 0;
+        paymentDateField.value = new Date().toISOString().slice(0, 10);
+        receiverField.value = 1;
+        collectorFeeRateField.value = 0.06;
+        updateCollectorFee();
+    });
+
+    if (receiptNumberField) {
+        receiptNumberField.addEventListener("input", updateNotesFromReceiptNumber);
+        updateNotesFromReceiptNumber();
+    }
+
+    if (copyNotesBtn) {
+        copyNotesBtn.addEventListener("click", function() {
+            if (!notesField) {
+                return;
+            }
+            navigator.clipboard.writeText(notesField.value).then(function() {
+                const originalText = copyNotesBtn.textContent;
+                copyNotesBtn.textContent = "Αντιγράφηκε!";
+                copyNotesBtn.classList.add('copied');
+                setTimeout(function() {
+                    copyNotesBtn.textContent = originalText;
+                    copyNotesBtn.classList.remove('copied');
+                }, 1200);
+            });
+        });
+    }
+
+    copyAndSaveBtn.addEventListener("click", async function() {
+        if (!notesField) {
+            return;
+        }
+        try {
+            await navigator.clipboard.writeText(notesField.value);
+            receiptForm.requestSubmit();
+        } catch (error) {
+            window.alert("Δεν ήταν δυνατή η αντιγραφή του μηνύματος. Η αποθήκευση δεν πραγματοποιήθηκε.");
+        }
+    });
+
+    function updateCollectorFee() {
+        const paid = parseFloat(paidField.value) || 0;
+        const rate = parseFloat(collectorFeeRateField.value) || 0;
+        collectorFeeField.value = (paid * rate).toFixed(2);
+    }
+
+    collectorFeeRateField.addEventListener("input", updateCollectorFee);
+
+    function updateNotesFromReceiptNumber() {
+        if (!receiptNumberField || !notesField) {
+            return;
+        }
+        const receiptNumber = receiptNumberField.value || "";
+        let noteValue = `Αρ. Απόδειξης ${receiptNumber}`;
+        if (sourceMsg) {
+            noteValue += ` ${sourceMsg}`;
+        }
+        notesField.value = noteValue.trim();
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Αρχική</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'cashtransactions' %}">Κινήσεις Ταμείου</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Διαγραφή Κίνησης</li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <h2 style="font-size:1.3rem;">Διαγραφή Κίνησης Ταμείου</h2>
+    
+    <div class="alert alert-warning" role="alert">
+        <h4 class="alert-heading">⚠️ Προσοχή!</h4>
+        <p>Πρόκειται να διαγράψετε τη κίνηση ταμείου:</p>
+        <ul>
+            <li><strong>Ημερομηνία:</strong> {{ object.transaction_date|date:"d/m/Y" }}</li>
+            <li><strong>Κατηγορία:</strong> {{ object.category.name }}</li>
+            <li><strong>Ποσό:</strong> {{ object.amount|floatformat:2 }} €</li>
+            <li><strong>Ταμίας:</strong> {% if object.receiver %}{{ object.receiver.receiver }}{% else %}-{% endif %}</li>
+        </ul>
+        <p class="mb-0">Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.</p>
+    </div>
+
+    <form method="post" class="d-flex gap-2">
+        {% csrf_token %}
+        {% if can_write %}
+            <button type="submit" class="btn btn-danger">🗑️ Διαγραφή</button>
+        {% else %}
+            <span class="text-muted">Προβολή μόνο — δεν έχετε δικαίωμα διαγραφής.</span>
+        {% endif %}
+        <a href="{% url 'cashtransactions' %}" class="btn btn-secondary">Ακύρωση</a>
+    </form>
+</div>
+
+<style>
+  @media (max-width: 576px) {
+    h2 { font-size: 1.1rem !important; }
+    .container-fluid { padding-left: 5px !important; padding-right: 5px !important; }
+    .btn { font-size: 0.95rem; padding: 0.45rem 0.8rem; }
+  }
+</style>
+{% endblock %}

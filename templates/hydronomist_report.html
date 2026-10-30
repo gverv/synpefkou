@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load l10n %}
+
+{% block title %}
+<title>Αναφορά υδρονομέα</title>
+{% endblock title %}
+
+{% block content %}
+<h2>Αναφορά υδρονομέα</h2>
+
+<form method="get" class="row g-3 align-items-end mb-4">
+    <div class="col-12 col-md-3">
+        <label for="{{ form.date_from.id_for_label }}" class="form-label">{{ form.date_from.label }}</label>
+        {{ form.date_from }}
+        {% for error in form.date_from.errors %}<div class="text-danger">{{ error }}</div>{% endfor %}
+    </div>
+    <div class="col-12 col-md-3">
+        <label for="{{ form.date_to.id_for_label }}" class="form-label">{{ form.date_to.label }}</label>
+        {{ form.date_to }}
+        {% for error in form.date_to.errors %}<div class="text-danger">{{ error }}</div>{% endfor %}
+    </div>
+    <div class="col-12 col-md-3">
+        <label for="{{ form.ydronomeas.id_for_label }}" class="form-label">{{ form.ydronomeas.label }}</label>
+        {{ form.ydronomeas }}
+        {% for error in form.ydronomeas.errors %}<div class="text-danger">{{ error }}</div>{% endfor %}
+    </div>
+    <div class="col-12 col-md-3">
+        <button type="submit" class="btn btn-primary">Εμφάνιση αναφοράς</button>
+    </div>
+</form>
+
+{% if form.non_field_errors %}
+    {% for error in form.non_field_errors %}<p class="text-danger">{{ error }}</p>{% endfor %}
+{% endif %}
+
+{% if form.is_bound and form.is_valid %}
+    <button type="button" class="btn btn-secondary mb-3" onclick="window.print()">Εκτύπωση</button>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Ημερομηνία</th>
+                <th>Ονοματεπώνυμο</th>
+                <th>Κυβικά</th>
+                <th>Υδρονομέας</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in report_rows %}
+            <tr>
+                <td>{{ row.date|date:"l d/m/Y" }}</td>
+                <td>{{ row.customer.surname }} {{ row.customer.name|default_if_none:"" }}</td>
+                <td>{{ row.billableCubicMeters|default_if_none:"—" }}</td>
+                <td>{{ row.hydronomistsRight|floatformat:2|localize }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4">Δεν βρέθηκαν εγγραφές για τα επιλεγμένα φίλτρα.</td></tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="3" class="text-end">Σύνολο υδρονομέα</th>
+                <th>{{ total_hydronomists|floatformat:2|localize }}</th>
+            </tr>
+        </tfoot>
+    </table>
+{% endif %}
+{% endblock content %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}
+<title>Συνεταιρισμός Αναφορά απλήρωτων αποδείξεων</title>
+<style>
+    .report-submit-bar {
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1030;
+        padding: 0.75rem 1rem;
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: 0 -0.25rem 0.75rem rgba(0, 0, 0, 0.12);
+        text-align: left;
+    }
+
+    .report-submit-spacer {
+        height: 5rem;
+    }
+
+    @media print {
+        .report-submit-bar,
+        .report-submit-spacer {
+            display: none;
+        }
+    }
+</style>
+{% endblock title %} 
+
+{% block content %}
+<h2>Επιλογή καταναλωτών για</h2>
+<h2>Αναφορά απλήρωτων αποδείξεων</h2>
+<form method="post">
+    {% csrf_token %}
+    <label>
+        <input type="checkbox" name="persons" value="all" id="select-all">
+        Όλοι
+    </label>
+    <br>
+    {% for person in persons %}
+        <label>
+            <input type="checkbox" name="persons" value="{{ person.id }}">
+            {{ person }}
+            {% comment %} {{ person.name }} {% endcomment %}
+        </label><br>
+    {% endfor %}
+    <div class="report-submit-spacer" aria-hidden="true"></div>
+    <div class="report-submit-bar">
+        <button type="submit" class="btn btn-success">Συνέχεια</button>
+    </div>
+</form>
+<script>
+document.getElementById('select-all').addEventListener('change', function() {
+    const checked = this.checked;
+    document.querySelectorAll('input[name="persons"]').forEach(function(cb) {
+        if (cb.value !== 'all') cb.checked = checked;
+    });
+});
+</script>
+{% endblock content %}

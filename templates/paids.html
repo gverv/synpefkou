@@ -1,0 +1,79 @@
+{% extends "base.html" %} 
+
+{% block title %}
+<title>Συνεταιρισμός - Πληρωμές</title>
+<style>
+  td a.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    padding: 5px 10px;
+    font-size: 14px;
+  }
+  @media (max-width: 576px) {
+    h4 {
+      font-size: 1.1rem;
+    }
+    .table {
+      font-size: 0.95rem;
+      overflow-x: auto;
+      display: block;
+      width: 100%;
+    }
+    td, th {
+      padding: 0.3rem;
+    }
+    .container, .container-fluid, .row, .col-md-8 {
+      padding-left: 5px !important;
+      padding-right: 5px !important;
+    }
+  }
+</style>
+{% endblock title %} 
+
+
+{% block content %}
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12 col-md-8">
+      <h4 class="text-center text-white bg-dark p-3">Αποδείξεις</h4>
+      {% include "_pagination.html" %}
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col"><a href="?sort=receiptNumber&order={% if sort_by == 'receiptNumber' and order == 'asc' %}desc{% else %}asc{% endif %}">ΑρΑπόδ</a></th>
+            <th scope="col"><a href="?sort=irrigation&order={% if sort_by == 'irrigation' and order == 'asc' %}desc{% else %}asc{% endif %}">Ποτισμός</a></th>
+            <th scope="col"><a href="?sort=paid&order={% if sort_by == 'paid' and order == 'asc' %}desc{% else %}asc{% endif %}">Πληρωμή</a></th>
+            <th scope="col"><a href="?sort=paymentDate&order={% if sort_by == 'paymentDate' and order == 'asc' %}desc{% else %}asc{% endif %}">Ημ/νία</a></th>
+            <th scope="col"><a href="?sort=balance&order={% if sort_by == 'balance' and order == 'asc' %}desc{% else %}asc{% endif %}">Ισοζύγιο</a></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for d in page_obj %}
+          <tr>
+            <td>
+              {% if d.balance == 0 %}
+                <a href="{% url 'paids_update' d.id %}" class="text-primary">{{ d.receiptNumber }}</a>
+              {% elif d.balance > 0 %}
+                <a href="{% url 'paids_update' d.id %}" class="text-success">{{ d.receiptNumber }}</a>
+              {% elif d.balance < 0 %}
+                <a href="{% url 'paids_update' d.id %}" class="text-danger">{{ d.receiptNumber }}</a>
+              {% else %}
+                <a href="{% url 'paids_update' d.id %}" class="text-warning">{{ d.receiptNumber }}</a>
+              {% endif %}
+            </td>
+            <td>{{ d.irrigation }}</td>
+            <td>{{ d.paid }}</td>
+            <td>{{ d.paymentDate }}</td>
+            <td>{{ d.balance }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% include "_pagination.html" %}
+
+{% endblock content %}

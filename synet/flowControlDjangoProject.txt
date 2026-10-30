@@ -1,0 +1,61 @@
+[Browser Request] 
+       │
+       ▼
+     urls.py
+       │
+       ▼
+─────────────────────────────────────────────
+  Βασικές Σελίδες
+─────────────────────────────────────────────
+/                   → index()                   → index.html
+/about/             → about()                   → about.html
+
+─────────────────────────────────────────────
+  Πελάτες (Persons)
+─────────────────────────────────────────────
+/customers/                        → customers()                     → customers.html
+/customers/<id>/edit/              → PersonsUpdateView               → persons_update.html
+/customers/<id>/irrigations/       → customerIrrigations()           → customerIrrigations.html
+
+─────────────────────────────────────────────
+  Μετρητές (Counters)
+─────────────────────────────────────────────
+/counters/                         → counters()                      → counters.html
+/counters/<id>/edit/               → CountersUpdateView              → counters_update.html
+/counters/<id>/                    → counter_detail()                → counter_detail.html
+
+─────────────────────────────────────────────
+  Πληρωμές (Paids)
+─────────────────────────────────────────────
+/paids/                            → paids()                         → paids.html
+/paids/<id>/edit/                  → PaidsUpdateView                 → paids_update.html
+/paids/<id>/update/                → paids_update() (function view)  → paids_update.html
+/irrigation/<id>/add_payment/      → addPayFromIrrigation()          → addPayFromIrrigation.html
+/irrigation/<id>/create_payment/   → create_payment()                 → create_payment.html
+
+─────────────────────────────────────────────
+  Ποτίσματα (WaterCons)
+─────────────────────────────────────────────
+/irrigations/add/                  → WaterConsCreateView             → add_irrigation.html
+/irrigations/<id>/edit/            → WaterConsUpdateView             → update_irrigation.html
+/irrigations/<id>/update/          → update_irrigation()             → update_irrigation.html
+
+─────────────────────────────────────────────
+  Αναφορές
+─────────────────────────────────────────────
+/report/                           → report_view()                   → report.html
+/select_persons/                   → select_persons_for_report()     → select_persons.html
+
+─────────────────────────────────────────────
+  Αναζήτηση
+─────────────────────────────────────────────
+/search/                           → global_search()                 → search_results.html
+
+─────────────────────────────────────────────
+  Ajax Endpoints (JSON Responses)
+─────────────────────────────────────────────
+/ajax/get_last_final_indication/<counter_id>/ → get_last_final_indication()
+/ajax/get_person_phone/                       → get_person_phone()
+/ajax/get_counter_last_reading/               → get_counter_last_reading()
+/ajax/send_sms/                               → send_sms_view()
+/ajax/get_params_for_watercons/               → get_params_for_watercons()

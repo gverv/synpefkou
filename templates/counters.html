@@ -1,0 +1,64 @@
+{% extends "base.html" %} 
+
+{% block title %}
+
+<title>Συνεταιρισμός - Μετρητές</title>
+<style>
+  @media (max-width: 576px) {
+    h2 {
+      font-size: 1.1rem;
+    }
+    .table {
+      font-size: 0.95rem;
+      overflow-x: auto;
+      display: block;
+      width: 100%;
+    }
+    td, th {
+      padding: 0.3rem;
+    }
+    .container, .container-fluid, .row, .col-md-8 {
+      padding-left: 5px !important;
+      padding-right: 5px !important;
+    }
+  }
+</style>
+
+{% endblock title %} 
+
+
+{% block content %}
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12 col-md-8">
+            <h2 class="text-center text-white bg-dark p-3">Μετρητές</h2>
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col"><a href="?sort=id&order={{ order }}">Id</a></th>
+                    <th scope="col"><a href="?sort=customer&order={{ order }}">Καταναλωτής</a></th>
+                    <th scope="col"><a href="?sort=collecter&order={{ order }}">Κολεκτέρ</a></th>
+                    <th scope="col"><a href="?sort=counter&order={{ order }}">Μετρητής</a></th>
+                    {% comment %} <th scope="col"><a href="?sort=sort_order&order={{ order }}">Σειρά ταξινόμησης</a></th>
+                    <th scope="col">Επεξεργασία</th> {% endcomment %}
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for d in data %}
+                  <tr>
+                    <td scope="row"><a href="/counters/{{d.id}}/detail/">{{d.id}}</a></td>
+                    <td>{{d.customer}}</td>
+                    <td>{{d.collecter}}</td>
+                    <td>{{d.counter}}</td>
+                    {% comment %} <td>{{d.sort_order}}</td>
+                    <td><a href="{% url 'counters_update' d.id %}" class="btn btn-warning">Επεξεργασία</a></td> {% endcomment %}
+                    {% comment %} <td><a type="button"  href="/delete/{{d.id}}"  class="btn btn-danger">Delete</a></td> {% endcomment %}
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

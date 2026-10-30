@@ -1,0 +1,71 @@
+{% extends "base.html" %} 
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb" class="bg-light border-bottom px-3 py-2" style="position: sticky; top: 56px; z-index: 1021;">
+  <ol class="breadcrumb mb-0">
+    <li class="breadcrumb-item"><a href="/">Αρχική</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Καταναλωτές</li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block title %}
+<title>Συνεταιρισμός - Καταναλωτές</title>
+<style>
+  td a.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    padding: 5px 10px;
+    font-size: 14px;
+  }
+  @media (max-width: 576px) {
+    h4 {
+      font-size: 1.1rem;
+    }
+    .table {
+      font-size: 0.95rem;
+      overflow-x: auto;
+      display: block;
+      width: 100%;
+    }
+    td, th {
+      padding: 0.3rem;
+    }
+    .container, .container-fluid, .row, .col-md-8 {
+      padding-left: 5px !important;
+      padding-right: 5px !important;
+    }
+  }
+</style>
+{% endblock title %} 
+
+{% block content %}
+<div class="container-fluid mt-2">
+  <div class="row">
+    <div class="col-12 col-md-8">
+            <h4 class="text-center text-white bg-dark p-3">Καταναλωτές</h4>
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">ΑΑ</th>
+                    <th scope="col"><a href="?sort=id&order={{ order }}">Id</a></th>
+                    <th scope="col"><a href="?sort=surname&order={{ order }}">Καταναλωτής</a></th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for d in data %}
+                  <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <th scope="row"><a href="/customers/{{d.id}}/update/">{{d.id}}</a></th>
+                    <td><a href="/customers/{{d.id}}/irrigations/">{{d.surname}} {{d.name}} {{d.fathersName}}</a></td>
+                    {% comment %} <td><a type="button"  href="/delete/{{d.id}}"  class="btn btn-danger">Delete</a></td> {% endcomment %}
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+        </div>
+    </div>
+</div>
+{% endblock content %}

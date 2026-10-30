@@ -1,0 +1,132 @@
+{% extends "base.html" %} 
+{% load humanize %}
+
+{% block title %}
+<title>Συνεταιρισμός Ποτισμοί</title>
+<style>
+  td a.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    padding: 5px 10px;
+    font-size: 14px;
+  }
+  @media (max-width: 576px) {
+    h4, h5 {
+      font-size: 1.1rem;
+    }
+    .table {
+      font-size: 0.95rem;
+      overflow-x: auto;
+      display: block;
+      width: 100%;
+    }
+    td, th {
+      padding: 0.3rem;
+    }
+    .container, .container-fluid, .row, .col-md-8 {
+      padding-left: 5px !important;
+      padding-right: 5px !important;
+    }
+  }
+</style>
+{% endblock title %} 
+
+
+{% block content %}
+
+{% if page_obj %}
+  {% include "_pagination.html" %}
+{% endif %}
+
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12 col-md-8">
+      <h4 class="text-center text-white bg-dark p-3 sticky-top">Ποτισμοί</h4>
+      <h5>
+        Συνολικά κυβικά: {{total_cubic|intcomma}} 
+        Χρεώσιμα: {{total_billable|intcomma}} 
+        Συνολική Αξία: <span class="format-number">{{ total_cost|floatformat:2 }}</span>
+        Υδρονομέας: <span class="format-number">{{ total_hydronomists|floatformat:2 }}</span>
+        Εκκαθαρισμένες πληρωμές: <span class="format-number">{{ total_paid|floatformat:2 }}</span>
+        Εκκαθαρισμένη οφειλή: <span class="format-number">{{ debt|floatformat:2 }}</span>
+      </h5>
+
+      <table class="table">
+        <thead>
+          <tr>
+{% comment %} 
+            <th scope="col"><a href="?sort=id&order={{ order }}">Id</a></th>
+            <th scope="col"><a href="?sort=customer&order={{ order }}">Καταναλωτής</a></th>
+            <th scope="col"><a href="?sort=date&order={{ order }}">ΗμερομηνίαΠοτ</a></th>
+            <th scope="col"><a href="?sort=cubicMeters&order={{ order }}">Πραγματικά</a></th>
+            <th scope="col"><a href="?sort=billableCubicMeters&order={{ order }}">Χρεώσιμα</a></th>
+            <th scope="col"><a href="?sort=cost&order={{ order }}">Αξία</a></th>
+ {% endcomment %}
+            <th scope="col">Id</th>
+            <th scope="col">Καταναλωτής</th>
+            <th scope="col">ΗμερομηνίαΠοτ</th>
+            <th scope="col">Πραγματικά</th>
+            <th scope="col">Χρεώσιμα</th>
+            <th scope="col">Αξία</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if page_obj %}
+            {% for obj in page_obj %}
+            <tr class="align-items-center">
+              <td><a href="{% url 'update_irrigation' obj.id %}">{{ obj.id }}</a></td>
+              <td>{{ obj.customer }}</td>
+              <td>{{ obj.date|date:"D, d-m-y" }}</td>
+              <td>{{ obj.cubicMeters }}</td>
+              <td>{{ obj.billableCubicMeters }}</td>
+              <td>
+                {% if obj.paid_irrigations.exists %}
+                  <a href="{% url 'paids_update' obj.paid_irrigations.first.id %}" class="text-primary">{{ obj.cost }}</a>
+                {% else %}
+                  <a href="{% url 'create_payment' obj.id %}" class="text-success">{{ obj.cost }}</a>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            {% for obj in objects %}
+            <tr class="align-items-center">
+              <td><a href="{% url 'update_irrigation' obj.id %}">{{ obj.id }}</a></td>
+              <td>{{ obj.customer }}</td>
+              <td>{{ obj.date|date:"D, d-m-y" }}</td>
+              <td>{{ obj.cubicMeters }}</td>
+              <td>{{ obj.billableCubicMeters }}</td>
+              <td>
+                {% if obj.paid_irrigations.exists %}
+                  <a href="{% url 'paids_update' obj.paid_irrigations.first.id %}" class="text-primary">{{ obj.cost }}</a>
+                {% else %}
+                  <a href="{% url 'create_payment' obj.id %}" class="text-success">{{ obj.cost }}</a>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+{% if page_obj %}
+  {% include "_pagination.html" %}
+{% endif %}
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+      let numberElements = document.querySelectorAll(".format-number");
+  
+      numberElements.forEach(element => {
+          let formattedValue = element.innerText.replace(/\B(?=(\d{3})+(?!\d))/g, ".").replace(/(\d+)\.(\d\d)$/, '$1,$2');
+          element.innerText = formattedValue;
+      });
+  });
+</script>
+{% endblock content %}

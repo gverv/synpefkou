@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}
+<title>Κατάσταση μετρητών</title>
+<style>
+    .counter-list-row {
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock title %}
+
+{% block content %}
+<h2>Κατάσταση μετρητών</h2>
+<button type="button" class="btn btn-secondary mb-3" onclick="window.print()">Εκτύπωση</button>
+
+{% for row in report_rows %}
+    <div class="counter-list-row">{{ row }}</div>
+{% empty %}
+    <p>Δεν υπάρχουν καταχωρημένοι μετρητές.</p>
+{% endfor %}
+{% endblock content %}

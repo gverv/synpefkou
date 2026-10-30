@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    <meta charset="UTF-8">
+    <title>Φόρμα Μετρητή</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+{% endblock title %}
+
+{% block content %}
+        <div class="container-fluid mt-4">
+                <h2 style="font-size:1.3rem;">Ενημέρωση Μετρητή</h2>
+                <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-4">{{ form.customer.label_tag }}<br>{{ form.customer }}</div>
+                        <div class="mb-4">{{ form.collecter.label_tag }}<br>{{ form.collecter }}</div>
+                        <div class="mb-4">{{ form.counter.label_tag }}<br>{{ form.counter }}</div>
+                        <div class="mb-4">{{ form.sort_order.label_tag }}<br>{{ form.sort_order }}</div>
+                        <div class="d-flex flex-column flex-md-row gap-2 mt-2">
+                            {% if can_write %}
+                                <button type="submit" class="btn btn-primary">Αποθήκευση</button>
+                            {% else %}
+                                <span class="text-muted">Προβολή μόνο — δεν έχετε δικαίωμα τροποποίησης.</span>
+                            {% endif %}
+                        </div>
+                </form>
+        </div>
+<style>
+    @media (max-width: 576px) {
+        h2 {
+            font-size: 1.1rem !important;
+        }
+        .container-fluid {
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+        }
+        .btn {
+            font-size: 0.95rem;
+            padding: 0.4rem 0.7rem;
+        }
+        .mt-2 {
+            margin-top: 0.7rem !important;
+        }
+        .mb-4 {
+            margin-bottom: 0.7rem !important;
+        }
+    }
+</style>
+{% endblock content %}
